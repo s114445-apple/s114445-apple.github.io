@@ -1,14 +1,159 @@
 <!DOCTYPE html>
+<html lang="zh-Hant">
+    
 <html>
     <head>
         <meta charset="utf-8">
-        <title>我的網站</title>
+        <title>Spring into action</title>
         <link rel="icon" href="icon.png">
         <link rel="stylesheet" href="index.css">
         <script src="index.js"></script>
     </head>
-    <body>
-        <h1>Hello World!</h1>
-        <button>按鈕</button>
-   </body>
+<style>
+body{
+    text-align:center;
+    font-family:sans-serif;
+    background:#f5f5f5;
+}
+
+#wheel{
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    border:5px solid black;
+    margin:30px auto;
+    transition:transform 3s ease-out;
+}
+
+button{
+    padding:12px 24px;
+    font-size:20px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>該不該轉盤</h1>
+
+<canvas id="wheel" width="300" height="300"></canvas>
+
+<button onclick="spin()">開始轉</button>
+
+<script>
+
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+
+const options = [
+"該","不該",
+"該","不該",
+"該","不該",
+"該","不該"
+];
+
+let spinCount = 0;
+
+function drawWheel(){
+
+    const slices=8;
+    const angle=2*Math.PI/slices;
+
+    for(let i=0;i<slices;i++){
+
+        ctx.beginPath();
+        ctx.moveTo(150,150);
+
+        ctx.arc(
+            150,150,
+            150,
+            i*angle,
+            (i+1)*angle
+        );
+
+        ctx.fillStyle =
+        i%2===0 ? "#ffcc66" : "#66ccff";
+
+        ctx.fill();
+
+        ctx.stroke();
+
+        ctx.save();
+
+        ctx.translate(150,150);
+        ctx.rotate(i*angle+angle/2);
+
+        ctx.fillStyle="black";
+        ctx.font="24px sans-serif";
+
+        ctx.fillText(
+            options[i],
+            80,
+            10
+        );
+
+        ctx.restore();
+    }
+}
+
+drawWheel();
+
+let currentRotation=0;
+
+function spin(){
+
+    spinCount++;
+
+    let result;
+
+    if(spinCount % 3 ===0){
+
+        result="該";
+
+    }else{
+
+        result=
+        Math.random()<0.5
+        ? "該"
+        : "不該";
+    }
+
+    const possibleIndex=[];
+
+    options.forEach((v,i)=>{
+        if(v===result)
+            possibleIndex.push(i);
+    });
+
+    const chosen =
+    possibleIndex[
+        Math.floor(
+        Math.random()*possibleIndex.length
+        )
+    ];
+
+    const sliceAngle=360/8;
+
+    const targetRotation=
+        360*5
+        +(360-(chosen*sliceAngle))
+        -sliceAngle/2;
+
+    currentRotation+=targetRotation;
+
+    canvas.style.transform=
+    `rotate(${currentRotation}deg)`;
+
+    setTimeout(()=>{
+
+        alert("結果："+result);
+
+    },3100);
+
+}
+
+</script>
+
+</body>
 </html>
