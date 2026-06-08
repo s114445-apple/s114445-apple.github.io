@@ -35,7 +35,14 @@ button{
 
 <body>
 
-<h1>我該 <span id="questionText">___</span> 嗎？</h1>
+<h1>
+    我該
+    <input
+        type="text"
+        id="userQuestion"
+        placeholder="輸入想做的事">
+    嗎？
+</h1>
 
 <canvas id="wheel" width="300" height="300"></canvas>
 
@@ -100,23 +107,6 @@ function drawWheel(){
 drawWheel();
 
 let currentRotation=0;
-
-function updateQuestion(){
-
-    let text =
-    document.getElementById(
-        "userQuestion"
-    ).value;
-
-    if(text.trim()!=""){
-
-        document.getElementById(
-            "questionText"
-        ).innerText = text;
-
-    }
-
-}
 
 function spin(){
 
