@@ -106,10 +106,10 @@ const ctx =
 canvas.getContext("2d");
 
 const options = [
-"該","不急",
-"該","不急",
-"該","不急",
-"該","不急"
+"快去","不急",
+"快去","不急",
+"快去","不急",
+"快去","不急"
 ];
 
 function drawWheel(){
@@ -132,7 +132,7 @@ function drawWheel(){
         );
 
         ctx.fillStyle =
-        options[i] === "該"
+        options[i] === "快去"
         ? "#d98585"
         : "#e8d8b6";
 
@@ -189,13 +189,13 @@ function spin(){
 
     if(spinCount % 3 === 0){
 
-        result = "該";
+        result = "快去";
 
     }else{
 
         result =
         Math.random() < 0.5
-        ? "該"
+        ? "快去"
         : "不急";
     }
 
