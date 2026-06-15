@@ -3,7 +3,6 @@
 
 <head>
 <meta charset="UTF-8">
-
 <title>Spring into action</title>
 
 <link rel="icon" href="icon.png">
@@ -23,15 +22,15 @@ h1{
 
 input{
     font-size:24px;
-    padding:5px 10px;
-    width:220px;
+    padding:8px;
+    width:240px;
     text-align:center;
 }
 
 #wheel-container{
-    position:relative;
-    width:300px;
+    width:320px;
     margin:30px auto;
+    position:relative;
 }
 
 #pointer{
@@ -43,18 +42,13 @@ input{
     border-top:40px solid #444;
 
     margin:0 auto -5px auto;
-
-    position:relative;
     z-index:10;
+    position:relative;
 }
 
 #wheel{
-    width:300px;
-    height:300px;
-
     border-radius:50%;
     border:5px solid #444;
-
     transition:transform 3s ease-out;
 }
 
@@ -66,8 +60,6 @@ button{
 
     font-size:20px;
 
-    cursor:pointer;
-
     border:none;
 
     border-radius:10px;
@@ -75,6 +67,51 @@ button{
     background:#d98585;
 
     color:white;
+
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+/* 結果視窗 */
+
+#resultPopup{
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.6);
+
+    z-index:9998;
+}
+
+#resultContent{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    min-width:300px;
+
+    font-size:24px;
 }
 
 /* 警告視窗 */
@@ -91,7 +128,7 @@ button{
     width:100%;
     height:100%;
 
-    background:rgba(0,0,0,0.75);
+    background:rgba(0,0,0,0.8);
 
     z-index:9999;
 }
@@ -105,7 +142,7 @@ button{
 
     transform:translate(-50%,-50%);
 
-    background:#ff2222;
+    background:red;
 
     color:white;
 
@@ -117,43 +154,30 @@ button{
 
     font-weight:bold;
 
-    text-align:center;
-
     animation:flash 0.3s infinite;
+
 }
 
 @keyframes flash{
 
-    0%{
-        opacity:1;
-    }
+    0%{opacity:1;}
+    50%{opacity:0.3;}
+    100%{opacity:1;}
 
-    50%{
-        opacity:0.3;
-    }
-
-    100%{
-        opacity:1;
-    }
 }
 
 </style>
-
 </head>
 
 <body>
 
 <h1>
-
 我該
-
 <input
 type="text"
 id="userQuestion"
 placeholder="輸入想做的事">
-
 嗎？
-
 </h1>
 
 <div id="wheel-container">
@@ -171,6 +195,26 @@ height="300">
 <button onclick="spin()">
 開始轉
 </button>
+
+<!-- 結果 -->
+
+<div id="resultPopup">
+
+    <div id="resultContent">
+
+        <div id="resultText"></div>
+
+        <br>
+
+        <button onclick="closeResult()">
+        關閉
+        </button>
+
+    </div>
+
+</div>
+
+<!-- 警告 -->
 
 <div id="warningPopup">
 
@@ -201,12 +245,20 @@ const options = [
 
 ];
 
+let currentRotation = 0;
+
+let consecutiveNotYet = 0;
+
+let isSpinning = false;
+
+/* 畫轉盤 */
+
 function drawWheel(){
 
     const slices = 8;
 
     const angle =
-    2*Math.PI/slices;
+    2 * Math.PI / slices;
 
     for(let i=0;i<slices;i++){
 
@@ -221,8 +273,8 @@ function drawWheel(){
             150,
             150,
             150,
-            i*angle,
-            (i+1)*angle
+            i * angle,
+            (i+1) * angle
         );
 
         ctx.fillStyle =
@@ -231,9 +283,6 @@ function drawWheel(){
         : "#e8d8b6";
 
         ctx.fill();
-
-        ctx.strokeStyle =
-        "#444";
 
         ctx.stroke();
 
@@ -245,12 +294,12 @@ function drawWheel(){
         );
 
         ctx.rotate(
-            i*angle +
+            i * angle +
             angle/2
         );
 
         ctx.fillStyle =
-        "#222";
+        "#333";
 
         ctx.font =
         "24px sans-serif";
@@ -267,13 +316,44 @@ function drawWheel(){
 
 drawWheel();
 
-let currentRotation = 0;
+/* 結果視窗 */
 
-let consecutiveNotYet = 0;
+function showResult(text){
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML = text;
+
+    document
+    .getElementById(
+        "resultPopup"
+    )
+    .style.display =
+    "block";
+}
+
+function closeResult(){
+
+    document
+    .getElementById(
+        "resultPopup"
+    )
+    .style.display =
+    "none";
+}
+
+/* 轉盤 */
 
 function spin(){
 
+    if(isSpinning){
+        return;
+    }
+
     const question =
+
     document
     .getElementById(
         "userQuestion"
@@ -315,95 +395,62 @@ function spin(){
         return;
     }
 
-    const result =
-    Math.random()<0.5
-    ? "該"
-    : "不急";
+    isSpinning = true;
 
-    if(result==="不急"){
+    const spinDegrees =
 
-        consecutiveNotYet++;
-
-    }else{
-
-        consecutiveNotYet=0;
-    }
-
-    const positions=[];
-
-    options.forEach(
-        (value,index)=>{
-
-        if(value===result){
-
-            positions.push(
-                index
-            );
-
-        }
-
-    });
-
-    const chosenIndex =
-    positions[
-        Math.floor(
-            Math.random()
-            *
-            positions.length
-        )
-    ];
-
-    const sliceAngle =
-    360/8;
-
-    const targetRotation =
-
-        360*5 +
-
-        (
-
-            360
-
-            -
-
-            (
-
-                chosenIndex
-
-                *
-
-                sliceAngle
-
-            )
-
-            -
-
-            sliceAngle/2
-
-        );
+        1800 +
+        Math.random()*360;
 
     currentRotation +=
-    targetRotation;
+    spinDegrees;
 
     canvas.style.transform =
     `rotate(${currentRotation}deg)`;
 
     setTimeout(()=>{
 
+        const normalized =
+
+        (
+            currentRotation % 360
+            + 360
+        ) % 360;
+
+        const pointerAngle =
+
+        (
+            450 -
+            normalized
+        ) % 360;
+
+        const index =
+
+        Math.floor(
+            pointerAngle / 45
+        );
+
+        const result =
+        options[index];
+
         let message;
 
         if(result==="該"){
+
+            consecutiveNotYet = 0;
 
             message =
             "趕快去^_^";
 
         }else{
 
+            consecutiveNotYet++;
+
             message =
             "不急不急";
         }
 
-        alert(
+        showResult(
 
             "我該 "
 
@@ -413,15 +460,21 @@ function spin(){
 
             +
 
-            " 嗎？\n\n"
+            " 嗎？<br><br><b>"
 
             +
 
             message
 
+            +
+
+            "</b>"
+
         );
 
-    },3100);
+        isSpinning = false;
+
+    },3000);
 }
 
 </script>
