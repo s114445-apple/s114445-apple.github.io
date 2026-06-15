@@ -2,16 +2,14 @@
 <html lang="zh-Hant">
 
 <head>
-        <meta charset="utf-8">
-        <title>Spring into action</title>
-        <link rel="icon" href="icon.png">
-        <link rel="stylesheet" href="index.css">
-        <script src="index.js"></script>
-
 <meta charset="UTF-8">
+
 <title>Spring into action</title>
 
+<link rel="icon" href="icon.png">
+
 <style>
+
 body{
     text-align:center;
     font-family:sans-serif;
@@ -45,6 +43,7 @@ input{
     border-top:40px solid #444;
 
     margin:0 auto -5px auto;
+
     position:relative;
     z-index:10;
 }
@@ -52,33 +51,109 @@ input{
 #wheel{
     width:300px;
     height:300px;
+
     border-radius:50%;
     border:5px solid #444;
+
     transition:transform 3s ease-out;
 }
 
 button{
+
     margin-top:20px;
+
     padding:12px 24px;
+
     font-size:20px;
+
     cursor:pointer;
+
     border:none;
+
     border-radius:10px;
+
     background:#d98585;
+
     color:white;
 }
+
+/* 警告視窗 */
+
+#warningPopup{
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.75);
+
+    z-index:9999;
+}
+
+#warningContent{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    background:#ff2222;
+
+    color:white;
+
+    padding:40px;
+
+    border-radius:20px;
+
+    font-size:36px;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    animation:flash 0.3s infinite;
+}
+
+@keyframes flash{
+
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:0.3;
+    }
+
+    100%{
+        opacity:1;
+    }
+}
+
 </style>
+
 </head>
 
 <body>
 
 <h1>
+
 我該
+
 <input
 type="text"
 id="userQuestion"
 placeholder="輸入想做的事">
+
 嗎？
+
 </h1>
 
 <div id="wheel-container">
@@ -97,6 +172,18 @@ height="300">
 開始轉
 </button>
 
+<div id="warningPopup">
+
+    <div id="warningContent">
+
+        你已經拖很久了。<br><br>
+
+        ✋👁️👁️🤚
+
+    </div>
+
+</div>
+
 <script>
 
 const canvas =
@@ -106,22 +193,29 @@ const ctx =
 canvas.getContext("2d");
 
 const options = [
+
 "該","不急",
 "該","不急",
 "該","不急",
 "該","不急"
+
 ];
 
 function drawWheel(){
 
     const slices = 8;
-    const angle = 2*Math.PI/slices;
+
+    const angle =
+    2*Math.PI/slices;
 
     for(let i=0;i<slices;i++){
 
         ctx.beginPath();
 
-        ctx.moveTo(150,150);
+        ctx.moveTo(
+            150,
+            150
+        );
 
         ctx.arc(
             150,
@@ -138,16 +232,28 @@ function drawWheel(){
 
         ctx.fill();
 
-        ctx.strokeStyle="#444";
+        ctx.strokeStyle =
+        "#444";
+
         ctx.stroke();
 
         ctx.save();
 
-        ctx.translate(150,150);
-        ctx.rotate(i*angle + angle/2);
+        ctx.translate(
+            150,
+            150
+        );
 
-        ctx.fillStyle="#222";
-        ctx.font="24px sans-serif";
+        ctx.rotate(
+            i*angle +
+            angle/2
+        );
+
+        ctx.fillStyle =
+        "#222";
+
+        ctx.font =
+        "24px sans-serif";
 
         ctx.fillText(
             options[i],
@@ -162,7 +268,8 @@ function drawWheel(){
 drawWheel();
 
 let currentRotation = 0;
-let spinCount = 0;
+
+let consecutiveNotYet = 0;
 
 function spin(){
 
@@ -174,7 +281,7 @@ function spin(){
     .value
     .trim();
 
-    if(question === ""){
+    if(question===""){
 
         alert(
             "請先輸入問題"
@@ -183,30 +290,55 @@ function spin(){
         return;
     }
 
-    spinCount++;
+    if(consecutiveNotYet >= 2){
 
-    let result;
+        document
+        .getElementById(
+            "warningPopup"
+        )
+        .style.display =
+        "block";
 
-    if(spinCount % 3 === 0){
+        setTimeout(()=>{
 
-        result = "該";
+            document
+            .getElementById(
+                "warningPopup"
+            )
+            .style.display =
+            "none";
+
+        },3000);
+
+        consecutiveNotYet = 0;
+
+        return;
+    }
+
+    const result =
+    Math.random()<0.5
+    ? "該"
+    : "不急";
+
+    if(result==="不急"){
+
+        consecutiveNotYet++;
 
     }else{
 
-        result =
-        Math.random() < 0.5
-        ? "該"
-        : "不急";
+        consecutiveNotYet=0;
     }
 
-    const positions = [];
+    const positions=[];
 
     options.forEach(
         (value,index)=>{
 
         if(value===result){
 
-            positions.push(index);
+            positions.push(
+                index
+            );
 
         }
 
@@ -216,25 +348,38 @@ function spin(){
     positions[
         Math.floor(
             Math.random()
-            * positions.length
+            *
+            positions.length
         )
     ];
 
     const sliceAngle =
-    360 / 8;
+    360/8;
 
     const targetRotation =
-        360 * 5 +
+
+        360*5 +
+
         (
+
             360
+
             -
+
             (
+
                 chosenIndex
+
                 *
+
                 sliceAngle
+
             )
+
             -
+
             sliceAngle/2
+
         );
 
     currentRotation +=
@@ -243,32 +388,43 @@ function spin(){
     canvas.style.transform =
     `rotate(${currentRotation}deg)`;
 
-setTimeout(()=>{
+    setTimeout(()=>{
 
-    let message;
+        let message;
 
-    if(result === "該"){
+        if(result==="該"){
 
-        message = "趕快去^_^";
+            message =
+            "趕快去^_^";
 
-    }else{
+        }else{
 
-        message = "不急不急";
+            message =
+            "不急不急";
+        }
 
-    }
+        alert(
 
-    alert(
-        "我該 " +
-        question +
-        " 嗎？\n\n" +
-        message
-    );
+            "我該 "
 
-},3100);
+            +
+
+            question
+
+            +
+
+            " 嗎？\n\n"
+
+            +
+
+            message
+
+        );
+
+    },3100);
 }
 
 </script>
 
 </body>
-
 </html>
